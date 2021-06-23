@@ -17,13 +17,39 @@ a_time: {a_time_errors}\n\n""")
 def time_format_check(time):
     if not isinstance(time, str):
         return False
-    if time == "":
-        return False
+
     if len(time) != 5:
         return False
     if time[0:2].isdigit() and time[2] == ":" and time[3:].isdigit():
         return True
     return True
+
+
+def bus_id_check(id):
+    if not isinstance(id, int) or id == "":
+        return False
+    return True
+
+def stop_id_check(id):
+    if not isinstance(id, int) or id == "":
+        return False
+    return True
+
+def stop_name_check(name):
+    if not isinstance(name, str) or name == "":
+        return False
+    return True
+
+def next_stop_check(stop):
+    if not isinstance(stop, int) or stop == "":
+        return False
+    return True
+
+def stop_type_check(type):
+    if not isinstance(type, str) or len(type) > 1:
+        return False
+    return True
+
 
 
 bus_id_errors = 0
@@ -46,30 +72,30 @@ for x in data:
     stop_type = x["stop_type"]
     a_time = x["a_time"]
 
-
-    if not isinstance(bus_id, int) or bus_id == "":
+    if not bus_id_check(bus_id):
         bus_id_errors += 1
         total_errors += 1
-    if not isinstance(stop_id, int) or stop_id == "":
+
+    if not stop_id_check(stop_id):
         stop_id_errors += 1
         total_errors += 1
-    if not isinstance(stop_name, str) or stop_name == "":
+
+    if not stop_name_check(stop_name):
         stop_name_errors += 1
         total_errors += 1
-    if not isinstance(next_stop, int) or next_stop == "":
+
+    if not next_stop_check(next_stop):
         next_stop_errors += 1
         total_errors += 1
-    if not isinstance(stop_type, str) or len(stop_type) > 1:
+
+    if not stop_type_check(stop_type):
         stop_type_errors += 1
         total_errors += 1
-
-
 
     # move it to function using global access
     if time_format_check(a_time):
         if int(current_time) < int(a_time[0:2]) * 60 + int(a_time[3:5]):
             current_time = int(a_time[0:2]) * 60 + int(a_time[3:5])
-
     else:
         a_time_errors += 1
         total_errors += 1
