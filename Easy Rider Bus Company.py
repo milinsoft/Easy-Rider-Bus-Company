@@ -1,4 +1,3 @@
-# Write your awesome code here
 import json
 import string
 
@@ -15,12 +14,13 @@ a_time: {a_time_errors}\n\n""")
 
 
 def time_format_check(time):
+    global current_time
     if not isinstance(time, str):
         return False
-
     if len(time) != 5:
         return False
     if time[0:2].isdigit() and time[2] == ":" and time[3:].isdigit():
+        current_time = int(a_time[0:2]) * 60 + int(a_time[3:5])
         return True
     return True
 
@@ -51,7 +51,6 @@ def stop_type_check(type):
     return True
 
 
-
 bus_id_errors = 0
 stop_id_errors = 0
 stop_name_errors = 0
@@ -61,7 +60,6 @@ a_time_errors = 0
 
 total_errors = 0
 current_time = 0
-
 
 
 for x in data:
@@ -92,11 +90,7 @@ for x in data:
         stop_type_errors += 1
         total_errors += 1
 
-    # move it to function using global access
-    if time_format_check(a_time):
-        if int(current_time) < int(a_time[0:2]) * 60 + int(a_time[3:5]):
-            current_time = int(a_time[0:2]) * 60 + int(a_time[3:5])
-    else:
+    if not time_format_check(a_time):
         a_time_errors += 1
         total_errors += 1
 
