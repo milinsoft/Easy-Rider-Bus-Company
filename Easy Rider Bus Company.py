@@ -4,6 +4,16 @@ import string
 
 data = json.loads(input())  # proper way to read the json file
 
+def print_report():
+    print(f"""Type and required field validation: {total_errors} errors
+bus_id: {bus_id_errors}
+stop_id: {stop_id_errors}
+stop_name: {stop_name_errors}
+next_stop: {next_stop_errors}
+stop_type: {stop_type_errors}
+a_time: {a_time_errors}\n\n""")
+
+
 def time_format_check(time):
     if not isinstance(time, str):
         return False
@@ -26,26 +36,6 @@ a_time_errors = 0
 total_errors = 0
 current_time = 0
 
-def date_format_check(date):
-    if not isinstance(date, str):
-        return False
-    elif len(date) != 5:
-        return False
-    elif date[0:2].isdigit() and date[2] == ":" and date[3:].isdigit():
-        return True
-    else:
-        return False
-
-
-def date_format_check(date):
-    if not isinstance(date, str):
-        return False
-    elif len(date) != 5:
-        return False
-    elif date[0:2].isdigit() and date[2] == ":" and date[3:].isdigit():
-        return True
-    else:
-        return False
 
 
 for x in data:
@@ -74,37 +64,14 @@ for x in data:
         total_errors += 1
 
 
-    #elif not any([stop_type == "S", stop_type == "O", stop_type == "", stop_type == "S"]):
-    #    next_stop_errors += 1
-    #    total_errors +=1
-    #elif stop_type == "O" and stop_id == 1 or stop_type == "O" and stop_id == 2:
-    #    next_stop_errors += 1
-    #    total_errors +=1
 
     # move it to function using global access
     if time_format_check(a_time):
         if int(current_time) < int(a_time[0:2]) * 60 + int(a_time[3:5]):
             current_time = int(a_time[0:2]) * 60 + int(a_time[3:5])
 
-    elif not time_format_check(a_time):
+    else:
         a_time_errors += 1
         total_errors += 1
 
-    #if isinstance(stop_type, int):
-    #    stop_type_errors += 1
-    #    total_errors += 1
-    #    print("FUCK YOU")
-    #print(type(stop_type))
-
-    #print(stop_type)
-    #print(a_time)
-
-print(f"""Type and required field validation: {total_errors} errors
-bus_id: {bus_id_errors}
-stop_id: {stop_id_errors}
-stop_name: {stop_name_errors}
-next_stop: {next_stop_errors}
-stop_type: {stop_type_errors}
-a_time: {a_time_errors}
-
-""")
+print_report()
