@@ -1,27 +1,35 @@
-import json
-import string
+import json, re
+
 
 data = json.loads(input())  # proper way to read the json file
 
 def print_report():
-    print(f"""Type and required field validation: {total_errors} errors
-bus_id: {bus_id_errors}
-stop_id: {stop_id_errors}
-stop_name: {stop_name_errors}
-next_stop: {next_stop_errors}
-stop_type: {stop_type_errors}
-a_time: {a_time_errors}\n\n""")
+    # report function is re-written for the #2 stage just to output and calculate 3 relevant fields
+    print(f"Type and required field validation: {stop_name_errors + stop_type_errors + a_time_errors} errors")
+    # print(f"bus_id: {bus_id_errors}")
+    # print(f"stop_id: {stop_id_errors}")
+    print(f"stop_name: {stop_name_errors}")
+    # print(f"next_stop: {next_stop_errors}")
+    print(f"stop_type: {stop_type_errors}")
+
+    print(f"a_time: {a_time_errors}\n\n")
 
 
 def time_format_check(time):
+    # implementing regex here to make sure our time has correct 24h format.
     global current_time
     if not isinstance(time, str):
         return False
     if len(time) != 5:
         return False
-    if time[0:2].isdigit() and time[2] == ":" and time[3:].isdigit():
-        current_time = int(a_time[0:2]) * 60 + int(a_time[3:5])
-        return True
+    else:
+        template = r'\A([0-1]\d|2[0-3]):([0-5]\d)$'
+        match = re.match(template, time)
+        if match:
+            current_time = int(a_time[0:2]) * 60 + int(a_time[3:5])
+            return True
+        else:
+            return False
     return True
 
 
@@ -36,9 +44,13 @@ def stop_id_check(id):
     return True
 
 def stop_name_check(name):
+    # implementing regex here to check if stop name format is ok
     if not isinstance(name, str) or name == "":
         return False
-    return True
+    else:
+        template = r'([A-Z][a-z]+ ?){1,2} {1,2}(Road|Avenue|Boulevard|Street)$'
+        match = re.match(template,name)
+        return True if match else False
 
 def next_stop_check(stop):
     if not isinstance(stop, int) or stop == "":
@@ -46,9 +58,13 @@ def next_stop_check(stop):
     return True
 
 def stop_type_check(type):
-    if not isinstance(type, str) or len(type) > 1:
+    if not isinstance(type, str):
         return False
-    return True
+    else:
+        # making sure that stop_type has 'SOF' or '' format
+        template = r'[SOF]?$'
+        match = re.match(template, type)
+        return True if match else False
 
 
 bus_id_errors = 0
