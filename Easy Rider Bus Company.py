@@ -14,6 +14,9 @@ def print_report():
 
     print(f"a_time: {a_time_errors}\n\n")
 
+def print_steps_report():
+    for bus in stops_dict:
+        print(f"bus_id: {bus} stops {len(stops_dict[bus])}")
 
 def time_format_check(time):
     # implementing regex here to make sure our time has correct 24h format.
@@ -66,17 +69,10 @@ def stop_type_check(type):
         match = re.match(template, type)
         return True if match else False
 
+# declaring "error" variables
+bus_id_errors, stop_id_errors, stop_name_errors, next_stop_errors, stop_type_errors, a_time_errors, total_errors, current_time = 0, 0, 0, 0, 0, 0, 0, 0
 
-bus_id_errors = 0
-stop_id_errors = 0
-stop_name_errors = 0
-next_stop_errors = 0
-stop_type_errors = 0
-a_time_errors = 0
-
-total_errors = 0
-current_time = 0
-
+stops_dict = {128: [], 256: [], 512: [], 1024: []}
 
 for x in data:
     bus_id = x["bus_id"]
@@ -85,6 +81,8 @@ for x in data:
     next_stop = x["next_stop"]
     stop_type = x["stop_type"]
     a_time = x["a_time"]
+    # the following line appends stop names into a stops_dict dictionary so we can count all them
+    stops_dict[bus_id].append(stop_name)
 
     if not bus_id_check(bus_id):
         bus_id_errors += 1
@@ -109,5 +107,6 @@ for x in data:
     if not time_format_check(a_time):
         a_time_errors += 1
         total_errors += 1
+# print_report() #disabled for stage # 3
 
-print_report()
+print_steps_report()
