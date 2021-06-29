@@ -75,7 +75,7 @@ def stop_type_check(type):
 # declaring "error" variables
 bus_id_errors, stop_id_errors, stop_name_errors, next_stop_errors, stop_type_errors, a_time_errors, total_errors, current_time = 0, 0, 0, 0, 0, 0, 0, 0
 
-stops_dict = [y[x] for y in data for x in y if x == 'bus_id']
+stops_dict = [x[y] for x in data for y in x if y == 'bus_id']
 stops_dict = list(set(stops_dict)) # set() function used to remove duplicates from the list, list() function used to make list from the set.
 stops_dict = dict.fromkeys(stops_dict, [])
 
