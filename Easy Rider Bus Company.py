@@ -92,7 +92,7 @@ bus_id_errors, stop_id_errors, stop_name_errors, next_stop_errors, stop_type_err
 current_time = "00:00"  # declaring current time default value
 
 # creating the stops list:
-stops_list = [y[x] for y in data for x in y if x == 'bus_id']
+stops_list = [x[y] for x in data for y in x if y == 'bus_id']
 stops_list = list(set(stops_list)) # set() function used to remove duplicates from the list, list() function used to make list from the set.
 # taking values from stops_list as keys, and empty lists as values arrays for the stop_name values:
 stops_dict = dict.fromkeys(stops_list, [])
@@ -100,7 +100,18 @@ stops_dict = dict.fromkeys(stops_list, [])
 # assigning stop name values to the stops_dict variable
 for _ in range(len(stops_dict)):
     for bus in stops_dict:
-        stops_dict[bus] = [x[y] for x in data for y in x if y == 'stop_name' and x['bus_id'] == bus]
+        stops_dict[bus] = [busId[value] for busId in data for value in busId if value == 'stop_name' and busId['bus_id'] == bus]
+
+
+# processing json variable data to create the dictionary(without duplicates) with the following information:
+# bus_id as a key
+# stop_name and stop_type as values in a list
+stop_names_types = dict.fromkeys(stops_list, [])
+for _ in range(len(stops_dict)):
+    for bus in stop_names_types:
+        stop_names_types[bus] = [busId[value] for busId in data for value in busId if any([(value == 'stop_name' and busId['bus_id'] == bus), (value == 'stop_type' and busId['bus_id'] == bus)])]
+
+
 
 for x in data:
     bus_id = x["bus_id"]
@@ -136,4 +147,29 @@ for x in data:
         total_errors += 1
 
 
-print_steps_report()
+def start_stop_transfer():
+    # This function checks if the bus has exactly one start and one final stop
+    # also it will either terminate the program and print an error message or it will print out the information regarding the start, finish and transfer stops
+    for bus in stop_names_types:
+        if any([stop_names_types[bus].count("F"), stop_names_types[bus].count("S")]) != 1:
+            print(f"There is no start or end stop for the line: {bus}.")
+            exit()
+        else:
+            print("test passed")
+
+
+def start_stop_transfer1():
+    counter_S = 0
+    counter_F = 0
+    start_stops = dict.fromkeys(stops_list, [])
+    for x in data:
+        print(x)
+        #print(x["bus_id"])
+
+
+# potential bug : next bus has earlier start time than the last stop of the previous one
+print("\n\n\n\n")
+#print(stop_names_types)
+
+start_stop_transfer1()
+# start_stops[bus] = [busId["stop_name"] for busId in data for value in busId['stop_type'] == "S"]
