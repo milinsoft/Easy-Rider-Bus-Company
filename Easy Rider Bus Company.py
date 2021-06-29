@@ -3,6 +3,9 @@ import json, re
 
 data = json.loads(input())  # proper way to read the json file
 
+#data = [{"bus_id" : 128, "stop_id" : 1, "stop_name" : "Prospekt Avenue", "next_stop" : 3, "stop_type" : "S", "a_time" : "08:12"}, {"bus_id" : 128, "stop_id" : 3, "stop_name" : "Elm Street", "next_stop" : 5, "stop_type" : "", "a_time" : "08:19"}, {"bus_id" : 128, "stop_id" : 5, "stop_name" : "Fifth Avenue", "next_stop" : 7, "stop_type" : "O", "a_time" : "08:25"}, {"bus_id" : 128, "stop_id" : 7, "stop_name" : "Sesame Street", "next_stop" : 0, "stop_type" : "F", "a_time" : "08:37"}, {"bus_id" : 256, "stop_id" : 2, "stop_name" : "Pilotow Street", "next_stop" : 3, "stop_type" : "S", "a_time" : "09:20"}, {"bus_id" : 256, "stop_id" : 3, "stop_name" : "Elm Street", "next_stop" : 6, "stop_type" : "", "a_time" : "09:45"}, {"bus_id" : 256, "stop_id" : 6, "stop_name" : "Sunset Boulevard", "next_stop" : 7, "stop_type" : "", "a_time" : "09:59"}, {"bus_id" : 256, "stop_id" : 7, "stop_name" : "Sesame Street", "next_stop" : 0, "stop_type" : "F", "a_time" : "10:12"}, {"bus_id" : 512, "stop_id" : 4, "stop_name" : "Bourbon Street", "next_stop" : 6, "stop_type" : "S", "a_time" : "08:13"}, {"bus_id" : 512, "stop_id" : 6, "stop_name" : "Sunset Boulevard", "next_stop" : 0, "stop_type" : "F", "a_time" : "08:16"}]
+[{'bus_id': 128, 'stop_id': 1, 'stop_name': 'Prospekt Avenue', 'next_stop': 3, 'stop_type': 'S', 'a_time': '08:12'}, {'bus_id': 128, 'stop_id': 3, 'stop_name': 'Elm Street', 'next_stop': 5, 'stop_type': '', 'a_time': '08:19'}, {'bus_id': 128, 'stop_id': 5, 'stop_name': 'Fifth Avenue', 'next_stop': 7, 'stop_type': 'O', 'a_time': '08:25'}, {'bus_id': 128, 'stop_id': 7, 'stop_name': 'Sesame Street', 'next_stop': 0, 'stop_type': 'F', 'a_time': '08:37'}, {'bus_id': 256, 'stop_id': 2, 'stop_name': 'Pilotow Street', 'next_stop': 3, 'stop_type': 'S', 'a_time': '09:20'}, {'bus_id': 256, 'stop_id': 3, 'stop_name': 'Elm Street', 'next_stop': 6, 'stop_type': '', 'a_time': '09:45'}, {'bus_id': 256, 'stop_id': 6, 'stop_name': 'Sunset Boulevard', 'next_stop': 7, 'stop_type': '', 'a_time': '09:59'}, {'bus_id': 256, 'stop_id': 7, 'stop_name': 'Sesame Street', 'next_stop': 0, 'stop_type': 'F', 'a_time': '10:12'}, {'bus_id': 512, 'stop_id': 4, 'stop_name': 'Bourbon Street', 'next_stop': 6, 'stop_type': 'S', 'a_time': '08:13'}, {'bus_id': 512, 'stop_id': 6, 'stop_name': 'Sunset Boulevard', 'next_stop': 0, 'stop_type': 'F', 'a_time': '08:16'}]
+
 def print_report():
     # report function is re-written for the #2 stage just to output and calculate 3 relevant fields
     print(f"Type and required field validation: {stop_name_errors + stop_type_errors + a_time_errors} errors")
@@ -72,7 +75,13 @@ def stop_type_check(type):
 # declaring "error" variables
 bus_id_errors, stop_id_errors, stop_name_errors, next_stop_errors, stop_type_errors, a_time_errors, total_errors, current_time = 0, 0, 0, 0, 0, 0, 0, 0
 
-stops_dict = {128: [], 256: [], 512: [], 1024: []}
+stops_dict = [y[x] for y in data for x in y if x == 'bus_id']
+stops_dict = list(set(stops_dict)) # set() function used to remove duplicates from the list, list() function used to make list from the set.
+stops_dict = dict.fromkeys(stops_dict, [])
+
+for _ in range(len(stops_dict)):
+    for bus in stops_dict:
+        stops_dict[bus] = [x[y] for x in data for y in x if y == 'stop_name' and x['bus_id'] == bus]
 
 for x in data:
     bus_id = x["bus_id"]
@@ -82,7 +91,6 @@ for x in data:
     stop_type = x["stop_type"]
     a_time = x["a_time"]
     # the following line appends stop names into a stops_dict dictionary so we can count all them
-    stops_dict[bus_id].append(stop_name)
 
     if not bus_id_check(bus_id):
         bus_id_errors += 1
@@ -107,6 +115,6 @@ for x in data:
     if not time_format_check(a_time):
         a_time_errors += 1
         total_errors += 1
-# print_report() #disabled for stage # 3
+
 
 print_steps_report()
