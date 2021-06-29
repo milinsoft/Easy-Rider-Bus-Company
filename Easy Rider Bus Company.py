@@ -1,13 +1,16 @@
+# version with auto-detection of bus numbers
 import json, re
 
-
+# reading json file from the input and saving in a json format
 data = json.loads(input())  # proper way to read the json file
 
+# the below line is for test purposes. pretty handy while testing new features
 #data = [{"bus_id" : 128, "stop_id" : 1, "stop_name" : "Prospekt Avenue", "next_stop" : 3, "stop_type" : "S", "a_time" : "08:12"}, {"bus_id" : 128, "stop_id" : 3, "stop_name" : "Elm Street", "next_stop" : 5, "stop_type" : "", "a_time" : "08:19"}, {"bus_id" : 128, "stop_id" : 5, "stop_name" : "Fifth Avenue", "next_stop" : 7, "stop_type" : "O", "a_time" : "08:25"}, {"bus_id" : 128, "stop_id" : 7, "stop_name" : "Sesame Street", "next_stop" : 0, "stop_type" : "F", "a_time" : "08:37"}, {"bus_id" : 256, "stop_id" : 2, "stop_name" : "Pilotow Street", "next_stop" : 3, "stop_type" : "S", "a_time" : "09:20"}, {"bus_id" : 256, "stop_id" : 3, "stop_name" : "Elm Street", "next_stop" : 6, "stop_type" : "", "a_time" : "09:45"}, {"bus_id" : 256, "stop_id" : 6, "stop_name" : "Sunset Boulevard", "next_stop" : 7, "stop_type" : "", "a_time" : "09:59"}, {"bus_id" : 256, "stop_id" : 7, "stop_name" : "Sesame Street", "next_stop" : 0, "stop_type" : "F", "a_time" : "10:12"}, {"bus_id" : 512, "stop_id" : 4, "stop_name" : "Bourbon Street", "next_stop" : 6, "stop_type" : "S", "a_time" : "08:13"}, {"bus_id" : 512, "stop_id" : 6, "stop_name" : "Sunset Boulevard", "next_stop" : 0, "stop_type" : "F", "a_time" : "08:16"}]
 [{'bus_id': 128, 'stop_id': 1, 'stop_name': 'Prospekt Avenue', 'next_stop': 3, 'stop_type': 'S', 'a_time': '08:12'}, {'bus_id': 128, 'stop_id': 3, 'stop_name': 'Elm Street', 'next_stop': 5, 'stop_type': '', 'a_time': '08:19'}, {'bus_id': 128, 'stop_id': 5, 'stop_name': 'Fifth Avenue', 'next_stop': 7, 'stop_type': 'O', 'a_time': '08:25'}, {'bus_id': 128, 'stop_id': 7, 'stop_name': 'Sesame Street', 'next_stop': 0, 'stop_type': 'F', 'a_time': '08:37'}, {'bus_id': 256, 'stop_id': 2, 'stop_name': 'Pilotow Street', 'next_stop': 3, 'stop_type': 'S', 'a_time': '09:20'}, {'bus_id': 256, 'stop_id': 3, 'stop_name': 'Elm Street', 'next_stop': 6, 'stop_type': '', 'a_time': '09:45'}, {'bus_id': 256, 'stop_id': 6, 'stop_name': 'Sunset Boulevard', 'next_stop': 7, 'stop_type': '', 'a_time': '09:59'}, {'bus_id': 256, 'stop_id': 7, 'stop_name': 'Sesame Street', 'next_stop': 0, 'stop_type': 'F', 'a_time': '10:12'}, {'bus_id': 512, 'stop_id': 4, 'stop_name': 'Bourbon Street', 'next_stop': 6, 'stop_type': 'S', 'a_time': '08:13'}, {'bus_id': 512, 'stop_id': 6, 'stop_name': 'Sunset Boulevard', 'next_stop': 0, 'stop_type': 'F', 'a_time': '08:16'}]
 
+# declaring functions:
 def print_report():
-    # report function is re-written for the #2 stage just to output and calculate 3 relevant fields
+    # report function is re-written for the #2-4 stage just to output and calculate 3 relevant fields
     print(f"Type and required field validation: {stop_name_errors + stop_type_errors + a_time_errors} errors")
     # print(f"bus_id: {bus_id_errors}")
     # print(f"stop_id: {stop_id_errors}")
@@ -18,11 +21,15 @@ def print_report():
     print(f"a_time: {a_time_errors}\n\n")
 
 def print_steps_report():
+    # This function prints out the bus_id and number of the stops it has
     for bus in stops_dict:
         print(f"bus_id: {bus} stops {len(stops_dict[bus])}")
 
 def time_format_check(time):
     # implementing regex here to make sure our time has correct 24h format.
+    # this function checks whether the time format provided in JSON file is valid.
+    # also it checks if the next stop has "later" time than the previous one.
+    # if one of the tests is not passed, the False value is returned.
     global current_time
     if not isinstance(time, str):
         return False
@@ -32,25 +39,29 @@ def time_format_check(time):
         template = r'\A([0-1]\d|2[0-3]):([0-5]\d)$'
         match = re.match(template, time)
         if match:
-            current_time = int(a_time[0:2]) * 60 + int(a_time[3:5])
-            return True
+            if int(current_time[0:2]) * 60 + int(current_time[3:5]) < int(time[0:2]) * 60 + int(time[3:5]):
+                current_time = time
+                return True
+            else:
+                return False
         else:
             return False
-    return True
-
 
 def bus_id_check(id):
+    # This function checks if bus_id variable format is correct and returns True or False for further processing
     if not isinstance(id, int) or id == "":
         return False
     return True
 
 def stop_id_check(id):
+    # This function checks if stop_id variable format is correct and returns True or False for further processing
     if not isinstance(id, int) or id == "":
         return False
     return True
 
 def stop_name_check(name):
     # implementing regex here to check if stop name format is ok
+    # This function checks if stop_name variable format is correct and returns True or False for further processing
     if not isinstance(name, str) or name == "":
         return False
     else:
@@ -59,11 +70,13 @@ def stop_name_check(name):
         return True if match else False
 
 def next_stop_check(stop):
+    # This function checks if next_stop variable format is correct and returns True or False for further processing
     if not isinstance(stop, int) or stop == "":
         return False
     return True
 
 def stop_type_check(type):
+    # This function checks if stop_type variable format is correct and returns True or False for further processing
     if not isinstance(type, str):
         return False
     else:
@@ -72,13 +85,19 @@ def stop_type_check(type):
         match = re.match(template, type)
         return True if match else False
 
+
+# Declaring variables:
 # declaring "error" variables
-bus_id_errors, stop_id_errors, stop_name_errors, next_stop_errors, stop_type_errors, a_time_errors, total_errors, current_time = 0, 0, 0, 0, 0, 0, 0, 0
+bus_id_errors, stop_id_errors, stop_name_errors, next_stop_errors, stop_type_errors, a_time_errors, total_errors = 0, 0, 0, 0, 0, 0, 0
+current_time = "00:00"  # declaring current time default value
 
-stops_dict = [x[y] for x in data for y in x if y == 'bus_id']
-stops_dict = list(set(stops_dict)) # set() function used to remove duplicates from the list, list() function used to make list from the set.
-stops_dict = dict.fromkeys(stops_dict, [])
+# creating the stops list:
+stops_list = [y[x] for y in data for x in y if x == 'bus_id']
+stops_list = list(set(stops_list)) # set() function used to remove duplicates from the list, list() function used to make list from the set.
+# taking values from stops_list as keys, and empty lists as values arrays for the stop_name values:
+stops_dict = dict.fromkeys(stops_list, [])
 
+# assigning stop name values to the stops_dict variable
 for _ in range(len(stops_dict)):
     for bus in stops_dict:
         stops_dict[bus] = [x[y] for x in data for y in x if y == 'stop_name' and x['bus_id'] == bus]
