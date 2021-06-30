@@ -93,7 +93,21 @@ def on_demand_stops_check():
     # else:
     # print("""On demand stops test:
     # Wrong stop type: ['Elm Street', 'Sunset Boulevard']""")
-    ...
+
+    sof_stops = sorted([line['stop_name'] for line in data if any([line['stop_type'] == 'S', line['stop_type'] == 'O', line['stop_type'] == 'F'])])
+    #list # 2
+    transfer_stops = [line['stop_name'] for line in data]
+    transfer_stops = [stop for stop in transfer_stops if transfer_stops.count(stop) > 1]
+    transfer_stops = sorted(list(set(transfer_stops)))
+
+    #list #3 intersections:
+    intersection_set = set(sof_stops).intersection(set(transfer_stops))
+    print("On demand stops test:\nOK")
+    if not intersection_set:
+        print("OK")
+    else:
+        print(f"Wrong stop type: {list(intersection_set)}")
+
 
 
 def stop_id_check(id_):
