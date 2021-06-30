@@ -83,6 +83,19 @@ def bus_id_check(id_):
     return True
 
 
+def on_demand_stops_check():
+    #NOT the best way is to take lists produeced by  start_stop_transfer() function // or create similar once
+    # 1 create a list of "S" + "O" + "F" stations
+    # 2 created a list of transfer stations (shared at least between two lines, list can be copies from start_stop_transfer() function
+    # 3 create an error list with intersection value
+    # if SOF list has no intersection with transfer_stations list:
+    # print("On demand stops test:\nOK")
+    # else:
+    # print("""On demand stops test:
+    # Wrong stop type: ['Elm Street', 'Sunset Boulevard']""")
+    ...
+
+
 def stop_id_check(id_):
     # This function checks if stop_id variable format is correct and returns True or False for further processing
     if not isinstance(id_, int) or id_ == "":
@@ -209,4 +222,4 @@ for x in data:
         a_time_errors += 1
         total_errors += 1
 
-time_travel_check()
+on_demand_stops_check()
