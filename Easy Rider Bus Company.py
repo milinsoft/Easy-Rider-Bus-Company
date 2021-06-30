@@ -32,24 +32,48 @@ def print_stops_report():
 def time_format_check(time):
     # implementing regex here to make sure our time has correct 24h format.
     # this function checks whether the time format provided in JSON file is valid.
-    # also it checks if the next stop has "later" time than the previous one.
     # if one of the tests is not passed, the False value is returned.
-    global current_time
     if not isinstance(time, str):
         return False
     if len(time) != 5:
         return False
     else:
+        # variable current time has been removed. now we use dictionary to check the most recent stop timing for a particular bus
         template = r'\A([0-1]\d|2[0-3]):([0-5]\d)$'
         match = re.match(template, time)
+
         if match:
-            if int(current_time[0:2]) * 60 + int(current_time[3:5]) < int(time[0:2]) * 60 + int(time[3:5]):
-                current_time = time
-                return True
-            else:
-                return False
+            # here can be a function call. or rewriting in 1 line
+            return True
         else:
             return False
+
+
+def time_travel_check():  # data
+    # also it checks if the next stop has "later" time than the previous one.
+    # if one of the tests is not passed, the False value is returned.
+    stops_timing = dict.fromkeys(stops_list, "00:00")
+    # make sure that time and bus_id passed to the function together
+    errors_dict = dict()
+    for x in data:
+        line_id = x["bus_id"]
+        station = x["stop_name"]
+        time = x["a_time"]
+        if int(stops_timing[line_id][0:2]) * 60 + int(stops_timing[line_id][3:5]) < int(time[0:2]) * 60 + int(time[3:5]):
+            stops_timing[line_id] = time
+            pass
+        else:
+            if line_id not in errors_dict:
+                errors_dict[line_id] = station
+            else:
+                continue
+    if len(errors_dict) == 0:
+        print("OK")
+    else:
+        print('Arrival time test:')
+        for line in errors_dict:
+            print(f'bus_id line {line}: wrong time on station {errors_dict[line]}')
+        return False
 
 
 def bus_id_check(id_):
@@ -95,16 +119,48 @@ def stop_type_check(type_):
         return True if match else False
 
 
+def start_stop_transfer():
+    # This function checks if the bus has exactly one start and one final stop
+    # also it will either terminate the program and print an error message or it will print out the information regarding the start, finish and transfer stops
+    start_stops = dict.fromkeys(stops_list, [])
+    finish_stops = dict.fromkeys(stops_list, [])
+    transfer_stops = [line['stop_name'] for line in data]
+    transfer_stops = [stop for stop in transfer_stops if transfer_stops.count(stop) > 1]
+    transfer_stops = sorted(list(set(transfer_stops)))
+
+    for i in stops_list:
+        start_stops[i] = [line['stop_name'] for line in data if (line['bus_id'] == i and line['stop_type'] == 'S')]
+        finish_stops[i] = [line['stop_name'] for line in data if (line['bus_id'] == i and line['stop_type'] == 'F')]
+
+    for line in start_stops:
+        if len(start_stops[line]) == 0:
+            print(f'There is no start or end stop for the line: {line}.')
+            exit()
+    for line in finish_stops:
+        if len(finish_stops[line]) == 0:
+            print(f'There is no start or end stop for the line: {line}.')
+            exit()
+
+    s1 = [x[0] for x in list(start_stops.values())]
+    f1 = [x[0] for x in list(finish_stops.values())]
+    s1 = sorted(list(set(s1)))
+    f1 = sorted(list(set(f1)))
+
+    print(f"""Start stops: {len(s1)} {s1}
+Transfer stops: {len(transfer_stops)} {transfer_stops}
+Finish stops: {len(f1)} {f1}""")
+
+
 # Declaring variables:
 # declaring "error" variables
 bus_id_errors, stop_id_errors, stop_name_errors, next_stop_errors, stop_type_errors, a_time_errors, total_errors = 0, 0, 0, 0, 0, 0, 0
-current_time = "00:00"  # declaring current time default value
 
 # creating the stops list:
 stops_list = [x[y] for x in data for y in x if y == 'bus_id']
 stops_list = list(set(stops_list))  # set() function used to remove duplicates from the list, list() function used to make list from the set.
 # taking values from stops_list as keys, and empty lists as values arrays for the stop_name values:
 stops_dict = dict.fromkeys(stops_list, [])
+
 
 # assigning stop name values to the stops_dict variable
 for _ in range(len(stops_dict)):
@@ -153,39 +209,4 @@ for x in data:
         a_time_errors += 1
         total_errors += 1
 
-
-def start_stop_transfer():
-    # This function checks if the bus has exactly one start and one final stop
-    # also it will either terminate the program and print an error message or it will print out the information regarding the start, finish and transfer stops
-    start_stops = dict.fromkeys(stops_list, [])
-    finish_stops = dict.fromkeys(stops_list, [])
-    transfer_stops = [line['stop_name'] for line in data]
-    transfer_stops = [stop for stop in transfer_stops if transfer_stops.count(stop) > 1]
-    transfer_stops = sorted(list(set(transfer_stops)))
-
-    for i in stops_list:
-        start_stops[i] = [line['stop_name'] for line in data if (line['bus_id'] == i and line['stop_type'] == 'S')]
-        finish_stops[i] = [line['stop_name'] for line in data if (line['bus_id'] == i and line['stop_type'] == 'F')]
-
-    for line in start_stops:
-        if len(start_stops[line]) == 0:
-            print(f'There is no start or end stop for the line: {line}.')
-            exit()
-    for line in finish_stops:
-        if len(finish_stops[line]) == 0:
-            print(f'There is no start or end stop for the line: {line}.')
-            exit()
-
-    s1 = [x[0] for x in list(start_stops.values())]
-    f1 = [x[0] for x in list(finish_stops.values())]
-    s1 = sorted(list(set(s1)))
-    f1 = sorted(list(set(f1)))
-
-    print(f"""Start stops: {len(s1)} {s1}
-Transfer stops: {len(transfer_stops)} {transfer_stops}
-Finish stops: {len(f1)} {f1}""")
-
-# potential bug : next bus has earlier start time than the last stop of the previous one
-
-
-start_stop_transfer()
+time_travel_check()
