@@ -1,12 +1,14 @@
 # version with auto-detection of bus numbers
-import json, re
+import json
+import re
 
 # reading json file from the input and saving in a json format
 data = json.loads(input())  # proper way to read the json file
 
 # the below line is for test purposes. pretty handy while testing new features
-#data = [{"bus_id" : 128, "stop_id" : 1, "stop_name" : "Prospekt Avenue", "next_stop" : 3, "stop_type" : "S", "a_time" : "08:12"}, {"bus_id" : 128, "stop_id" : 3, "stop_name" : "Elm Street", "next_stop" : 5, "stop_type" : "", "a_time" : "08:19"}, {"bus_id" : 128, "stop_id" : 5, "stop_name" : "Fifth Avenue", "next_stop" : 7, "stop_type" : "O", "a_time" : "08:25"}, {"bus_id" : 128, "stop_id" : 7, "stop_name" : "Sesame Street", "next_stop" : 0, "stop_type" : "F", "a_time" : "08:37"}, {"bus_id" : 256, "stop_id" : 2, "stop_name" : "Pilotow Street", "next_stop" : 3, "stop_type" : "S", "a_time" : "09:20"}, {"bus_id" : 256, "stop_id" : 3, "stop_name" : "Elm Street", "next_stop" : 6, "stop_type" : "", "a_time" : "09:45"}, {"bus_id" : 256, "stop_id" : 6, "stop_name" : "Sunset Boulevard", "next_stop" : 7, "stop_type" : "", "a_time" : "09:59"}, {"bus_id" : 256, "stop_id" : 7, "stop_name" : "Sesame Street", "next_stop" : 0, "stop_type" : "F", "a_time" : "10:12"}, {"bus_id" : 512, "stop_id" : 4, "stop_name" : "Bourbon Street", "next_stop" : 6, "stop_type" : "S", "a_time" : "08:13"}, {"bus_id" : 512, "stop_id" : 6, "stop_name" : "Sunset Boulevard", "next_stop" : 0, "stop_type" : "F", "a_time" : "08:16"}]
-[{'bus_id': 128, 'stop_id': 1, 'stop_name': 'Prospekt Avenue', 'next_stop': 3, 'stop_type': 'S', 'a_time': '08:12'}, {'bus_id': 128, 'stop_id': 3, 'stop_name': 'Elm Street', 'next_stop': 5, 'stop_type': '', 'a_time': '08:19'}, {'bus_id': 128, 'stop_id': 5, 'stop_name': 'Fifth Avenue', 'next_stop': 7, 'stop_type': 'O', 'a_time': '08:25'}, {'bus_id': 128, 'stop_id': 7, 'stop_name': 'Sesame Street', 'next_stop': 0, 'stop_type': 'F', 'a_time': '08:37'}, {'bus_id': 256, 'stop_id': 2, 'stop_name': 'Pilotow Street', 'next_stop': 3, 'stop_type': 'S', 'a_time': '09:20'}, {'bus_id': 256, 'stop_id': 3, 'stop_name': 'Elm Street', 'next_stop': 6, 'stop_type': '', 'a_time': '09:45'}, {'bus_id': 256, 'stop_id': 6, 'stop_name': 'Sunset Boulevard', 'next_stop': 7, 'stop_type': '', 'a_time': '09:59'}, {'bus_id': 256, 'stop_id': 7, 'stop_name': 'Sesame Street', 'next_stop': 0, 'stop_type': 'F', 'a_time': '10:12'}, {'bus_id': 512, 'stop_id': 4, 'stop_name': 'Bourbon Street', 'next_stop': 6, 'stop_type': 'S', 'a_time': '08:13'}, {'bus_id': 512, 'stop_id': 6, 'stop_name': 'Sunset Boulevard', 'next_stop': 0, 'stop_type': 'F', 'a_time': '08:16'}]
+# data = [{"bus_id" : 128, "stop_id" : 1, "stop_name" : "Prospekt Avenue", "next_stop" : 3, "stop_type" : "S", "a_time" : "08:12"}, {"bus_id" : 128, "stop_id" : 3, "stop_name" : "Elm Street", "next_stop" : 5, "stop_type" : "", "a_time" : "08:19"}, {"bus_id" : 128, "stop_id" : 5, "stop_name" : "Fifth Avenue", "next_stop" : 7, "stop_type" : "O", "a_time" : "08:25"}, {"bus_id" : 128, "stop_id" : 7, "stop_name" : "Sesame Street", "next_stop" : 0, "stop_type" : "F", "a_time" : "08:37"}, {"bus_id" : 256, "stop_id" : 2, "stop_name" : "Pilotow Street", "next_stop" : 3, "stop_type" : "S", "a_time" : "09:20"}, {"bus_id" : 256, "stop_id" : 3, "stop_name" : "Elm Street", "next_stop" : 6, "stop_type" : "", "a_time" : "09:45"}, {"bus_id" : 256, "stop_id" : 6, "stop_name" : "Sunset Boulevard", "next_stop" : 7, "stop_type" : "", "a_time" : "09:59"}, {"bus_id" : 256, "stop_id" : 7, "stop_name" : "Sesame Street", "next_stop" : 0, "stop_type" : "F", "a_time" : "10:12"}, {"bus_id" : 512, "stop_id" : 4, "stop_name" : "Bourbon Street", "next_stop" : 6, "stop_type" : "S", "a_time" : "08:13"}, {"bus_id" : 512, "stop_id" : 6, "stop_name" : "Sunset Boulevard", "next_stop" : 0, "stop_type" : "F", "a_time" : "08:16"}]
+# [{'bus_id': 128, 'stop_id': 1, 'stop_name': 'Prospekt Avenue', 'next_stop': 3, 'stop_type': 'S', 'a_time': '08:12'}, {'bus_id': 128, 'stop_id': 3, 'stop_name': 'Elm Street', 'next_stop': 5, 'stop_type': '', 'a_time': '08:19'}, {'bus_id': 128, 'stop_id': 5, 'stop_name': 'Fifth Avenue', 'next_stop': 7, 'stop_type': 'O', 'a_time': '08:25'}, {'bus_id': 128, 'stop_id': 7, 'stop_name': 'Sesame Street', 'next_stop': 0, 'stop_type': 'F', 'a_time': '08:37'}, {'bus_id': 256, 'stop_id': 2, 'stop_name': 'Pilotow Street', 'next_stop': 3, 'stop_type': 'S', 'a_time': '09:20'}, {'bus_id': 256, 'stop_id': 3, 'stop_name': 'Elm Street', 'next_stop': 6, 'stop_type': '', 'a_time': '09:45'}, {'bus_id': 256, 'stop_id': 6, 'stop_name': 'Sunset Boulevard', 'next_stop': 7, 'stop_type': '', 'a_time': '09:59'}, {'bus_id': 256, 'stop_id': 7, 'stop_name': 'Sesame Street', 'next_stop': 0, 'stop_type': 'F', 'a_time': '10:12'}, {'bus_id': 512, 'stop_id': 4, 'stop_name': 'Bourbon Street', 'next_stop': 6, 'stop_type': 'S', 'a_time': '08:13'}, {'bus_id': 512, 'stop_id': 6, 'stop_name': 'Sunset Boulevard', 'next_stop': 0, 'stop_type': 'F', 'a_time': '08:16'}]
+
 
 # declaring functions:
 def print_report():
@@ -20,10 +22,12 @@ def print_report():
 
     print(f"a_time: {a_time_errors}\n\n")
 
-def print_steps_report():
+
+def print_stops_report():
     # This function prints out the bus_id and number of the stops it has
-    for bus in stops_dict:
-        print(f"bus_id: {bus} stops {len(stops_dict[bus])}")
+    for line in stops_dict:
+        print(f"bus_id: {line} stops {len(stops_dict[line])}")
+
 
 def time_format_check(time):
     # implementing regex here to make sure our time has correct 24h format.
@@ -47,17 +51,20 @@ def time_format_check(time):
         else:
             return False
 
-def bus_id_check(id):
+
+def bus_id_check(id_):
     # This function checks if bus_id variable format is correct and returns True or False for further processing
-    if not isinstance(id, int) or id == "":
+    if not isinstance(id_, int) or id_ == "":
         return False
     return True
 
-def stop_id_check(id):
+
+def stop_id_check(id_):
     # This function checks if stop_id variable format is correct and returns True or False for further processing
-    if not isinstance(id, int) or id == "":
+    if not isinstance(id_, int) or id_ == "":
         return False
     return True
+
 
 def stop_name_check(name):
     # implementing regex here to check if stop name format is ok
@@ -66,8 +73,9 @@ def stop_name_check(name):
         return False
     else:
         template = r'([A-Z][a-z]+ ?){1,2} {1,2}(Road|Avenue|Boulevard|Street)$'
-        match = re.match(template,name)
+        match = re.match(template, name)
         return True if match else False
+
 
 def next_stop_check(stop):
     # This function checks if next_stop variable format is correct and returns True or False for further processing
@@ -75,14 +83,15 @@ def next_stop_check(stop):
         return False
     return True
 
-def stop_type_check(type):
+
+def stop_type_check(type_):
     # This function checks if stop_type variable format is correct and returns True or False for further processing
-    if not isinstance(type, str):
+    if not isinstance(type_, str):
         return False
     else:
         # making sure that stop_type has 'SOF' or '' format
         template = r'[SOF]?$'
-        match = re.match(template, type)
+        match = re.match(template, type_)
         return True if match else False
 
 
@@ -93,14 +102,14 @@ current_time = "00:00"  # declaring current time default value
 
 # creating the stops list:
 stops_list = [x[y] for x in data for y in x if y == 'bus_id']
-stops_list = list(set(stops_list)) # set() function used to remove duplicates from the list, list() function used to make list from the set.
+stops_list = list(set(stops_list))  # set() function used to remove duplicates from the list, list() function used to make list from the set.
 # taking values from stops_list as keys, and empty lists as values arrays for the stop_name values:
 stops_dict = dict.fromkeys(stops_list, [])
 
 # assigning stop name values to the stops_dict variable
 for _ in range(len(stops_dict)):
     for bus in stops_dict:
-        stops_dict[bus] = [busId[value] for busId in data for value in busId if value == 'stop_name' and busId['bus_id'] == bus]
+        stops_dict[bus] = [line[value] for line in data for value in line if value == 'stop_name' and line['bus_id'] == bus]
 
 
 # processing json variable data to create the dictionary(without duplicates) with the following information:
@@ -109,9 +118,7 @@ for _ in range(len(stops_dict)):
 stop_names_types = dict.fromkeys(stops_list, [])
 for _ in range(len(stops_dict)):
     for bus in stop_names_types:
-        stop_names_types[bus] = [busId[value] for busId in data for value in busId if any([(value == 'stop_name' and busId['bus_id'] == bus), (value == 'stop_type' and busId['bus_id'] == bus)])]
-
-
+        stop_names_types[bus] = [line[value] for line in data for value in line if any([(value == 'stop_name' and line['bus_id'] == bus), (value == 'stop_type' and line['bus_id'] == bus)])]
 
 for x in data:
     bus_id = x["bus_id"]
@@ -150,26 +157,35 @@ for x in data:
 def start_stop_transfer():
     # This function checks if the bus has exactly one start and one final stop
     # also it will either terminate the program and print an error message or it will print out the information regarding the start, finish and transfer stops
-    for bus in stop_names_types:
-        if any([stop_names_types[bus].count("F"), stop_names_types[bus].count("S")]) != 1:
-            print(f"There is no start or end stop for the line: {bus}.")
-            exit()
-        else:
-            print("test passed")
-
-
-def start_stop_transfer1():
-    counter_S = 0
-    counter_F = 0
     start_stops = dict.fromkeys(stops_list, [])
-    for x in data:
-        print(x)
-        #print(x["bus_id"])
+    finish_stops = dict.fromkeys(stops_list, [])
+    transfer_stops = [line['stop_name'] for line in data]
+    transfer_stops = [stop for stop in transfer_stops if transfer_stops.count(stop) > 1]
+    transfer_stops = sorted(list(set(transfer_stops)))
 
+    for i in stops_list:
+        start_stops[i] = [line['stop_name'] for line in data if (line['bus_id'] == i and line['stop_type'] == 'S')]
+        finish_stops[i] = [line['stop_name'] for line in data if (line['bus_id'] == i and line['stop_type'] == 'F')]
+
+    for line in start_stops:
+        if len(start_stops[line]) == 0:
+            print(f'There is no start or end stop for the line: {line}.')
+            exit()
+    for line in finish_stops:
+        if len(finish_stops[line]) == 0:
+            print(f'There is no start or end stop for the line: {line}.')
+            exit()
+
+    s1 = [x[0] for x in list(start_stops.values())]
+    f1 = [x[0] for x in list(finish_stops.values())]
+    s1 = sorted(list(set(s1)))
+    f1 = sorted(list(set(f1)))
+
+    print(f"""Start stops: {len(s1)} {s1}
+Transfer stops: {len(transfer_stops)} {transfer_stops}
+Finish stops: {len(f1)} {f1}""")
 
 # potential bug : next bus has earlier start time than the last stop of the previous one
-print("\n\n\n\n")
-#print(stop_names_types)
 
-start_stop_transfer1()
-# start_stops[bus] = [busId["stop_name"] for busId in data for value in busId['stop_type'] == "S"]
+
+start_stop_transfer()
